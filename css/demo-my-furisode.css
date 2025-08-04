@@ -75,7 +75,7 @@
 }
 
 .service-name {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #1e293b;
   margin-bottom: 8px;
@@ -2258,9 +2258,16 @@ zero-code {
 }
 
 .demo_comparison__simple .comparison-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
+}
+@media (max-width: 768px) {
+  .demo_comparison__simple .comparison-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
 }
 
 .demo_comparison__simple .comparison-item {
