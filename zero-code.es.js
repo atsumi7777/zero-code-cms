@@ -12023,8 +12023,8 @@ const Bd = { class: "zero-code-error-boundary" },
         Lo = async () => {
           try {
             const [O, B] = await Promise.all([
-              fetch("../sample-common-images.json"),
-              fetch("../sample-individual-images.json"),
+              fetch("/zero-code-cms/sample-common-images.json"),
+              fetch("/zero-code-cms/sample-individual-images.json"),
             ]);
             if (O.ok && B.ok) {
               const [j, oe] = await Promise.all([O.json(), B.json()]);
