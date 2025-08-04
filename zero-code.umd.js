@@ -11749,8 +11749,8 @@ ${$}}`;
           dr = async () => {
             try {
               const [T, O] = await Promise.all([
-                fetch("../sample-common-images.json"),
-                fetch("/sample-individual-images.json"),
+                fetch("/zero-code-cms/sample-common-images.json"),
+                fetch("/zero-code-cms/sample-individual-images.json"),
               ]);
               if (T.ok && O.ok) {
                 const [R, q] = await Promise.all([T.json(), O.json()]);
