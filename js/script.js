@@ -3,12 +3,12 @@
   document.addEventListener("DOMContentLoaded", async function () {
     try {
       // JSモジュールからデータをインポート
-      const { commonParts } = await import("./sample-common-parts.js");
-      const { individualParts } = await import("./sample-individual-parts.js");
-      const { pageData } = await import("./sample-page.js");
-      const { commonImagesData } = await import("./sample-common-images.js");
+      const { commonParts } = await import("../sample-common-parts.js");
+      const { individualParts } = await import("../sample-individual-parts.js");
+      const { pageData } = await import("../sample-page.js");
+      const { commonImagesData } = await import("../sample-common-images.js");
       const { individualImagesData } = await import(
-        "./sample-individual-images.js"
+        "../sample-individual-images.js"
       );
 
       // パーツデータを結合（従来の互換性のため）

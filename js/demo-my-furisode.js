@@ -29,18 +29,18 @@
       console.log("🌸 My振袖デモデータ読み込み中...");
 
       // 全ページデモデータを読み込み
-      const { demoFullPageData } = await import("/demo-full-page-data.js");
+      const { demoFullPageData } = await import("../demo-full-page-data.js");
       const { myFurisodeCommonParts } = await import(
-        "/demo-my-furisode-common-parts.js"
+        "../demo-my-furisode-common-parts.js"
       );
       const { myFurisodeIndividualParts } = await import(
-        "/demo-my-furisode-individual-parts.js"
+        "../demo-my-furisode-individual-parts.js"
       );
       const { myFurisodeCommonImages } = await import(
-        "/demo-my-furisode-common-images.js"
+        "../demo-my-furisode-common-images.js"
       );
       const { myFurisodeIndividualImages } = await import(
-        "/demo-my-furisode-individual-images.js"
+        "../demo-my-furisode-individual-images.js"
       );
 
       // main-editorにプロパティを設定
