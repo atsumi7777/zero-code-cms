@@ -1,0 +1,518 @@
+/**
+ * 振袖専門店「デモ振袖」CSS
+ * 個別スタイル定義
+ */
+
+/* ベースカラーバリエーション */
+:root {
+  --furisode-primary: #c44569;
+  --furisode-secondary: #ff6b9d;
+  --furisode-accent: #ff8a00;
+  --furisode-dark: #2c3e50;
+  --furisode-light: #f8e1e7;
+  --furisode-white: #ffffff;
+  --furisode-gradient: linear-gradient(45deg, #c44569, #ff6b9d);
+}
+
+/* 色バリエーション用クラス */
+.color-primary {
+  color: var(--furisode-primary) !important;
+}
+.color-secondary {
+  color: var(--furisode-secondary) !important;
+}
+.color-accent {
+  color: var(--furisode-accent) !important;
+}
+.color-dark {
+  color: var(--furisode-dark) !important;
+}
+
+.bg-primary {
+  background: var(--furisode-primary) !important;
+  color: white !important;
+}
+.bg-secondary {
+  background: var(--furisode-secondary) !important;
+  color: white !important;
+}
+.bg-accent {
+  background: var(--furisode-accent) !important;
+  color: white !important;
+}
+.bg-gradient {
+  background: var(--furisode-gradient) !important;
+  color: white !important;
+}
+.bg-light {
+  background: var(--furisode-light) !important;
+  color: var(--furisode-dark) !important;
+}
+.bg-white {
+  background: var(--furisode-white) !important;
+  color: var(--furisode-dark) !important;
+}
+
+/* 編集可能テキストの色を親要素から継承 */
+.zero-code-rich-editable-text {
+  color: inherit !important;
+}
+
+/* ヘッダー */
+.furisode-header {
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.furisode-header .container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 15px 20px;
+}
+
+.furisode-header .header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.furisode-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.furisode-header .logo img {
+  height: 50px;
+}
+
+.furisode-header .logo div {
+  font-size: 1.3rem;
+  font-weight: 700;
+  background: var(--furisode-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.furisode-header .main-nav {
+  display: flex;
+  gap: 35px;
+}
+
+.furisode-header .main-nav a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.3s;
+}
+
+.furisode-header .main-nav a:hover {
+  color: var(--furisode-primary);
+}
+
+.furisode-header .header-cta button {
+  background: var(--furisode-gradient);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-weight: 600;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 3px 10px rgba(196, 69, 105, 0.3);
+}
+
+.furisode-header .header-cta button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(196, 69, 105, 0.4);
+}
+
+/* ヒーロー */
+.furisode-hero {
+  position: relative;
+  height: 90vh;
+  background: linear-gradient(135deg, #f8e1e7 0%, #fdf2f4 50%, #f1e8ff 100%);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.furisode-hero .hero-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.1;
+}
+
+.furisode-hero .container {
+  position: relative;
+  z-index: 2;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.furisode-hero .hero-content {
+  /* Content styles handled by existing template */
+}
+
+.furisode-hero .hero-badge {
+  background: var(--furisode-gradient);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 25px;
+  display: inline-block;
+  margin-bottom: 25px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.furisode-hero h1 {
+  font-size: 3.2rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  line-height: 1.2;
+  background: var(--furisode-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.furisode-hero .hero-stats {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.furisode-hero .stat-item div:first-child {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--furisode-primary);
+}
+
+.furisode-hero .stat-item div:last-child {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.furisode-hero .cta-buttons {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.furisode-hero .cta-buttons button:first-child {
+  background: var(--furisode-gradient);
+  color: white;
+  border: none;
+  padding: 18px 35px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(196, 69, 105, 0.3);
+}
+
+.furisode-hero .cta-buttons button:last-child {
+  background: transparent;
+  color: var(--furisode-primary);
+  border: 2px solid var(--furisode-primary);
+  padding: 16px 35px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.furisode-hero .hero-image {
+  text-align: center;
+}
+
+.furisode-hero .hero-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.furisode-hero .image-caption {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+/* コレクション */
+.furisode-collection {
+  padding: 100px 20px;
+  background: #fafafa;
+  overflow: visible;
+}
+
+.furisode-collection .container {
+  max-width: 1400px;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.furisode-collection .section-header {
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.furisode-collection .section-header h2 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+  background: var(--furisode-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.furisode-collection .section-header p {
+  font-size: 1.3rem;
+  color: #666;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.furisode-collection .collection-grid {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
+}
+
+.furisode-collection .furisode-item {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.furisode-collection .furisode-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.furisode-collection .furisode-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.furisode-collection .furisode-image img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+.furisode-collection .collection-badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  color: white;
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.furisode-collection .furisode-info {
+  padding: 30px;
+}
+
+.furisode-collection .furisode-info h3 {
+  font-size: 1.4rem;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.furisode-collection .furisode-info p {
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.furisode-collection .price-section span {
+  font-size: 1.5rem;
+  color: var(--furisode-primary);
+  font-weight: 700;
+}
+
+.furisode-collection .furisode-info button {
+  background: var(--furisode-gradient);
+  color: white;
+  border: none;
+  padding: 12px 0;
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.furisode-collection .furisode-info button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(196, 69, 105, 0.3);
+}
+
+/* フッター */
+.furisode-footer {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+  padding: 80px 20px 40px;
+}
+
+.furisode-footer .container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.furisode-footer .footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 50px;
+  margin-bottom: 50px;
+}
+
+.furisode-footer .footer-section div:first-child {
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: var(--furisode-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.furisode-footer h3 {
+  color: var(--furisode-secondary);
+  margin-bottom: 25px;
+  font-size: 1.4rem;
+}
+
+.furisode-footer p {
+  margin-bottom: 25px;
+  line-height: 1.7;
+  color: #bdc3c7;
+}
+
+.furisode-footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.furisode-footer ul li {
+  margin-bottom: 12px;
+}
+
+.furisode-footer ul li a {
+  color: #bdc3c7;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.furisode-footer ul li a:hover {
+  color: var(--furisode-secondary);
+}
+
+.furisode-footer button {
+  background: var(--furisode-gradient);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-weight: 600;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-bottom: 25px;
+  width: 100%;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+}
+
+.furisode-footer .social-links {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.furisode-footer .social-links button {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  text-align: center;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.furisode-footer .footer-bottom {
+  text-align: center;
+  padding-top: 40px;
+  border-top: 1px solid #444;
+}
+
+.furisode-footer .footer-bottom div {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.furisode-footer .footer-bottom a {
+  color: #bdc3c7;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .furisode-hero .container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+
+  .furisode-hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .furisode-collection .collection-grid {
+    flex-direction: column;
+  }
+
+  .furisode-collection .furisode-item {
+    flex: none;
+  }
+
+  .furisode-header .main-nav {
+    flex-direction: column;
+    gap: 20px;
+  }
+}

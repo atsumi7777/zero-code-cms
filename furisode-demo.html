@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>デモ振袖 専門店デモ</title>
+    <!-- CMSエディターCSS -->
+    <link rel="stylesheet" href="./zero-code.css" />
+    <!-- 基本CSS -->
+    <link rel="stylesheet" href="./css/base.css" />
+    <link rel="stylesheet" href="./css/common.css" />
+    <!-- 振袖専門店CSS -->
+    <link rel="stylesheet" href="./css/furisode.css" />
+    <style>
+      .demo-container {
+        min-height: 100vh;
+      }
+
+      .demo-info {
+        background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-bottom: 3px solid #f8e1e7;
+      }
+
+      .demo-info h1 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+      }
+
+      .demo-info p {
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+        font-size: 1.2rem;
+        color: #666;
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 20px;
+        margin: 20px;
+        border-radius: 5px;
+        border: 1px solid #f5c6cb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-container">
+      <!-- デモ情報ヘッダー -->
+      <div class="demo-info">
+        <h1>🌸 デモ振袖専門店デモサイト</h1>
+        <p>振袖専門店向けサンプルデータを使用したCMSエディターのデモンストレーションです</p>
+      </div>
+
+      <!-- ローディング表示 -->
+      <div id="loading" class="loading">CMSエディターを読み込み中...</div>
+
+      <!-- エラー表示 -->
+      <div id="error" class="error" style="display: none">
+        <h3>エラーが発生しました</h3>
+        <p id="error-message"></p>
+        <p>CMSエディターライブラリまたはサンプルデータの読み込みに失敗しました。</p>
+      </div>
+
+      <!-- CMSエディター -->
+      <zero-code id="cms-editor"></zero-code>
+      
+      <!-- 固定フッター -->
+      <footer class="furisode-footer bg-dark">
+        <div class="container">
+          <div class="footer-content">
+            <div class="footer-section">
+              <div>
+                <div class="color-primary">デモ振袖</div>
+              </div>
+              <p>一生に一度の成人式を、最高の振袖で彩る。伝統と革新が融合した特別な一着をご提案いたします。</p>
+              <div class="shop-info">
+                <p><strong>所在地:</strong></p>
+                <p>東京都渋谷区表参道3-4-5 表参道ヒルズ2F</p>
+                <p><strong>電話:</strong> 03-1234-5678</p>
+                <p><strong>メール:</strong> info@demo-furisode.jp</p>
+              </div>
+            </div>
+            <div class="footer-section">
+              <h3 class="color-primary">サービス</h3>
+              <ul>
+                <li><a href="#">振袖レンタル</a></li>
+                <li><a href="#">振袖販売</a></li>
+                <li><a href="#">着付け・ヘアメイク</a></li>
+                <li><a href="#">記念撮影・フォトスタジオ</a></li>
+                <li><a href="#">小物・アクセサリー</a></li>
+              </ul>
+            </div>
+            <div class="footer-section">
+              <h3 class="color-primary">店舗情報</h3>
+              <div>
+                <p><strong>営業時間:</strong></p>
+                <p>平日: 10:00 - 19:00</p>
+                <p>土日祝: 9:00 - 20:00</p>
+                <p>定休日: 毎週水曜日</p>
+                <p>※ 完全予約制</p>
+              </div>
+            </div>
+            <div class="footer-section">
+              <h3 class="color-primary">ご予約・お問い合わせ</h3>
+              <p>成人式の振袖選び、前撮り撮影など、お気軽にご相談ください。</p>
+              <button class="bg-primary">来店予約フォーム</button>
+              <div class="social-links">
+                <button>📘</button>
+                <button>📷</button>
+                <button>🐦</button>
+              </div>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <p>&copy; 2024 デモ振袖. All rights reserved.</p>
+            <div>
+              <a href="#">プライバシーポリシー</a>
+              <a href="#">利用規約</a>
+              <a href="#">特定商取引法</a>
+              <a href="#">サイトマップ</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- CMSエディターライブラリ -->
+    <script src="./vue-cms-editor.optimized.umd.js"></script>
+
+    <!-- 振袖専門店向けサンプルデータ -->
+    <script src="./furisode-data.js"></script>
+
+    <script>
+      // エラーハンドリング関数
+      function showError(message) {
+        console.error('Demo Error:', message)
+        document.getElementById('loading').style.display = 'none'
+        document.getElementById('error').style.display = 'block'
+        document.getElementById('error-message').textContent = message
+      }
+
+      // 初期化関数
+      function initializeEditor() {
+        try {
+          // サンプルデータの確認
+          if (typeof window.furisodeData === 'undefined') {
+            throw new Error('振袖専門店向けサンプルデータが読み込まれていません')
+          }
+
+          // CMSエディターの確認
+          const editor = document.getElementById('cms-editor')
+          if (!editor) {
+            throw new Error('CMSエディター要素が見つかりません')
+          }
+
+          // データが正しく構造化されているか確認
+          const data = window.furisodeData
+          if (!data.images || !data.parts || !data.pageData) {
+            throw new Error('サンプルデータの構造が正しくありません')
+          }
+
+          console.log('振袖専門店データ読み込み完了:', data)
+          console.log('画像数:', data.images.length)
+          console.log('パーツ数:', data.parts.length)
+          console.log('ページデータ:', data.pageData.length)
+
+          // エディターにデータを設定
+          // 画像データを共通画像と個別画像に分離
+          const commonImages = data.images.filter(
+            img =>
+              img.id.includes('common') ||
+              [
+                'hero_bg',
+                'logo_common',
+                'banner_common',
+                'background_common',
+                'team_common',
+                'placeholder_common',
+              ].includes(img.id)
+          )
+          const individualImages = data.images.filter(img => !commonImages.includes(img))
+
+          editor.commonImages = commonImages
+          editor.individualImages = individualImages
+          editor.parts = data.parts
+
+          console.log('共通画像数:', commonImages.length)
+          console.log('個別画像数:', individualImages.length)
+
+          // ページデータを配列形式で設定（WebコンポーネントAPIに合わせる）
+          if (data.pageData) {
+            // pageDataが単一オブジェクトの場合は配列に変換
+            const pageArray = Array.isArray(data.pageData) ? data.pageData : [data.pageData]
+            editor.page = pageArray
+            console.log('ページデータ設定:', pageArray)
+          }
+
+          // ローディングを非表示
+          document.getElementById('loading').style.display = 'none'
+
+          console.log('振袖専門店デモの初期化が完了しました')
+        } catch (error) {
+          showError(error.message)
+        }
+      }
+
+      // DOM読み込み完了後に初期化
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeEditor)
+      } else {
+        // すでに読み込まれている場合は即座に実行
+        setTimeout(initializeEditor, 100)
+      }
+
+      // Webコンポーネントが定義されるまで待機
+      if (typeof customElements !== 'undefined') {
+        customElements
+          .whenDefined('zero-code')
+          .then(() => {
+            console.log('zero-code カスタム要素が定義されました')
+            if (document.readyState === 'complete') {
+              setTimeout(initializeEditor, 100)
+            }
+          })
+          .catch(error => {
+            console.error('カスタム要素の定義エラー:', error)
+            showError('CMSエディターの初期化に失敗しました')
+          })
+      }
+    </script>
+  </body>
+</html>

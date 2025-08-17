@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>デモ振袖 ブログ | 振袖記事</title>
+  <!-- 基本CSS -->
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/common.css">
+  <!-- CMSエディターCSS -->
+  <link rel="stylesheet" href="./zero-code.css">
+  <!-- 振袖CSS -->
+  <link rel="stylesheet" href="./css/furisode.css">
+  <!-- ブログCSS -->
+  <link rel="stylesheet" href="./css/blog.css">
+</head>
+<body>
+  <div class="blog-layout">
+    <!-- ヘッダー -->
+    <header class="blog-header">
+      <h1>デモ振袖 ブログ</h1>
+      <p>振袖・成人式に関する情報をお届けします</p>
+    </header>
+
+    <!-- サイドバー -->
+    <aside class="blog-sidebar">
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">カテゴリー</h3>
+        <ul class="sidebar-list">
+          <li><a href="#">振袖知識</a></li>
+          <li><a href="#">成人式準備</a></li>
+          <li><a href="#">着付け・ヘアメイク</a></li>
+          <li><a href="#">記念撮影</a></li>
+          <li><a href="#">店舗情報</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">最新記事</h3>
+        <ul class="sidebar-list">
+          <li><a href="#">振袖選びのポイント</a></li>
+          <li><a href="#">成人式当日の流れ</a></li>
+          <li><a href="#">前撮り撮影のコツ</a></li>
+          <li><a href="#">小物の選び方</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">お問い合わせ</h3>
+        <p style="font-size: 0.9rem; color: #6c757d; line-height: 1.6;">
+          振袖に関するご質問やご相談は<br>
+          お気軽にお問い合わせください。<br><br>
+          <strong>📞 03-1234-5678</strong><br>
+          営業時間: 10:00-19:00
+        </p>
+      </div>
+    </aside>
+
+    <!-- メインコンテンツ（CMSエディター） -->
+    <main class="blog-main">
+      <!-- 固定ブログタイトル -->
+      <article class="blog-article">
+        <header class="blog-header">
+          <h1 class="blog-title">振袖選びで失敗しないための5つのポイント</h1>
+          <div class="blog-meta">
+            <time class="blog-date">2024.08.17</time>
+            <span class="blog-category bg-primary">振袖知識</span>
+          </div>
+        </header>
+      </article>
+      
+      <!-- CMSエディター（本文部分） -->
+      <zero-code id="cms-editor"></zero-code>
+    </main>
+
+    <!-- フッター -->
+    <footer class="blog-footer">
+      <p>&copy; 2024 デモ振袖. All rights reserved.</p>
+      <p>一生に一度の成人式を、最高の振袖で彩る。</p>
+    </footer>
+  </div>
+
+  <!-- CMSエディターライブラリ -->
+  <script src="./vue-cms-editor.optimized.umd.js"></script>
+  
+  <!-- ブログ専用データ -->
+  <script src="./blog-data.js"></script>
+  
+  <script>
+    // エラーハンドリング関数
+    function showError(message) {
+      console.error('Blog Error:', message);
+      alert('エラー: ' + message);
+    }
+    
+    // 初期化関数
+    function initializeEditor() {
+      try {
+        // ブログデータの確認
+        if (typeof window.blogData === 'undefined') {
+          throw new Error('ブログ専用データが読み込まれていません');
+        }
+        
+        // CMSエディターの確認
+        const editor = document.getElementById('cms-editor');
+        if (!editor) {
+          throw new Error('CMSエディター要素が見つかりません');
+        }
+        
+        // データが正しく構造化されているか確認
+        const data = window.blogData;
+        if (!data.images || !data.parts || !data.pageData) {
+          throw new Error('サンプルデータの構造が正しくありません');
+        }
+        
+        console.log('ブログ用データ読み込み完了:', data);
+        console.log('画像数:', data.images.length);
+        console.log('パーツ数:', data.parts.length);
+        
+        // エディターにデータを設定
+        // 画像データを共通画像とブログ画像に分離
+        const commonImages = data.images.filter(img => img.id.includes('blog_placeholder') || img.id.includes('kimono_sample'));
+        const individualImages = data.images.filter(img => !commonImages.includes(img));
+        
+        editor.commonImages = commonImages;
+        editor.individualImages = individualImages;
+        editor.parts = data.parts;
+        
+        console.log('共通画像数:', commonImages.length);
+        console.log('ブログ画像数:', individualImages.length);
+        
+        // ブログ記事データを設定
+        editor.page = data.pageData;
+        console.log('ブログページデータ設定:', data.pageData);
+        
+        console.log('ブログエディターの初期化が完了しました');
+        
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+    
+    // DOM読み込み完了後に初期化
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeEditor);
+    } else {
+      setTimeout(initializeEditor, 100);
+    }
+    
+    // Webコンポーネントが定義されるまで待機
+    if (typeof customElements !== 'undefined') {
+      customElements.whenDefined('zero-code').then(() => {
+        console.log('zero-code カスタム要素が定義されました');
+        if (document.readyState === 'complete') {
+          setTimeout(initializeEditor, 100);
+        }
+      }).catch(error => {
+        console.error('カスタム要素の定義エラー:', error);
+        showError('CMSエディターの初期化に失敗しました');
+      });
+    }
+  </script>
+</body>
+</html>

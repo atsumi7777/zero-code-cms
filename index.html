@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Vue CMS エディター</title>
+  <!-- CMSエディターCSS -->
+  <link rel="stylesheet" href="./zero-code.css">
+  <!-- 基本CSS -->
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/common.css">
+</head>
+<body>
+  <!-- CMSエディター -->
+  <zero-code id="cms-editor"></zero-code>
+
+  <!-- CMSエディターライブラリ -->
+  <script src="./vue-cms-editor.optimized.umd.js"></script>
+  
+  <!-- 空データ -->
+  <script src="./data.js"></script>
+  
+  <script>
+    // エラーハンドリング関数
+    function showError(message) {
+      console.error('CMS Error:', message);
+      alert('エラー: ' + message);
+    }
+    
+    // 初期化関数
+    function initializeEditor() {
+      try {
+        // データの確認
+        if (typeof window.cmsData === 'undefined') {
+          throw new Error('CMSデータが読み込まれていません');
+        }
+        
+        // CMSエディターの確認
+        const editor = document.getElementById('cms-editor');
+        if (!editor) {
+          throw new Error('CMSエディター要素が見つかりません');
+        }
+        
+        // データが正しく構造化されているか確認
+        const data = window.cmsData;
+        if (!data.images || !data.parts || !data.pageData) {
+          throw new Error('データの構造が正しくありません');
+        }
+        
+        console.log('CMSデータ読み込み完了:', data);
+        console.log('画像数:', data.images.length);
+        console.log('パーツ数:', data.parts.length);
+        console.log('ページデータ:', data.pageData.length);
+        
+        // エディターにデータを設定
+        // 画像データを共通画像と個別画像に分離
+        const commonImages = data.images.filter(img => img.id && img.id.includes('common'));
+        const individualImages = data.images.filter(img => !commonImages.includes(img));
+        
+        editor.commonImages = commonImages;
+        editor.individualImages = individualImages;
+        editor.parts = data.parts;
+        
+        console.log('共通画像数:', commonImages.length);
+        console.log('個別画像数:', individualImages.length);
+        
+        // ページデータを配列形式で設定
+        if (data.pageData) {
+          const pageArray = Array.isArray(data.pageData) ? data.pageData : [data.pageData];
+          editor.page = pageArray;
+          console.log('ページデータ設定:', pageArray);
+        }
+        
+        console.log('CMSエディターの初期化が完了しました');
+        
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+    
+    // DOM読み込み完了後に初期化
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeEditor);
+    } else {
+      setTimeout(initializeEditor, 100);
+    }
+    
+    // Webコンポーネントが定義されるまで待機
+    if (typeof customElements !== 'undefined') {
+      customElements.whenDefined('zero-code').then(() => {
+        console.log('zero-code カスタム要素が定義されました');
+        if (document.readyState === 'complete') {
+          setTimeout(initializeEditor, 100);
+        }
+      }).catch(error => {
+        console.error('カスタム要素の定義エラー:', error);
+        showError('CMSエディターの初期化に失敗しました');
+      });
+    }
+  </script>
+</body>
+</html>
