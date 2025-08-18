@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Zero Code エディター - 開発者ガイド</title>
+  <link rel="stylesheet" href="./zero-code.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/common.css">
+  <style>
+    /* リセット */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      color: #2c3e50;
+      line-height: 1.6;
+    }
+
+    /* レイアウト */
+    .docs-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* サイドバー */
+    .sidebar {
+      width: 280px;
+      background: #f6f6f7;
+      border-right: 1px solid #e2e2e3;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    .sidebar-content {
+      padding: 32px 24px 96px;
+    }
+
+    .sidebar h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2c3e50;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 32px 0 8px;
+      padding: 8px 0;
+    }
+
+    .sidebar h3:first-child {
+      margin-top: 0;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar li {
+      margin: 2px 0;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 6px 0 6px 16px;
+      color: #2c3e50;
+      text-decoration: none;
+      font-size: 14px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .sidebar a:hover {
+      color: #42b883;
+    }
+
+    .sidebar a.active {
+      color: #42b883;
+      border-left-color: #42b883;
+      font-weight: 600;
+    }
+
+    /* メインコンテンツ */
+    .main-content {
+      flex: 1;
+      margin-left: 280px;
+      min-height: 100vh;
+      background: white;
+    }
+
+    .content-wrapper {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 64px 128px;
+    }
+
+    /* ヘッダー */
+    .page-header {
+      margin-bottom: 48px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #e2e2e3;
+    }
+
+    .page-header h1 {
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #42b883 0%, #35495e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .page-header .subtitle {
+      font-size: 20px;
+      color: #6a6a6a;
+      font-weight: 400;
+    }
+
+    /* セクション */
+    .content-section {
+      margin-bottom: 64px;
+    }
+
+    .content-section h2 {
+      font-size: 28px;
+      font-weight: 600;
+      margin: 48px 0 24px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e2e2e3;
+      color: #2c3e50;
+    }
+
+    .content-section h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 32px 0 16px;
+      color: #2c3e50;
+    }
+
+    .content-section h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 24px 0 12px;
+      color: #2c3e50;
+    }
+
+    .content-section p {
+      margin: 16px 0;
+      line-height: 1.7;
+      color: #476582;
+    }
+
+    .content-section ul,
+    .content-section ol {
+      margin: 16px 0;
+      padding-left: 32px;
+      color: #476582;
+    }
+
+    .content-section li {
+      margin: 8px 0;
+      line-height: 1.7;
+      list-style: disc;
+      margin-left: 20px;
+    }
+
+    /* コードブロック */
+    .code-block {
+      position: relative;
+      margin: 24px 0;
+      border-radius: 8px;
+      background: #282c34;
+      overflow: hidden;
+    }
+
+    .code-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      background: #21252b;
+      border-bottom: 1px solid #181a1f;
+    }
+
+    .code-lang {
+      color: #7c8491;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .copy-btn {
+      padding: 4px 8px;
+      background: transparent;
+      color: #7c8491;
+      border: 1px solid #7c8491;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: #7c8491;
+      color: #282c34;
+    }
+
+    .copy-btn.copied {
+      background: #42b883;
+      color: white;
+      border-color: #42b883;
+    }
+
+    .code-content {
+      padding: 16px;
+      overflow-x: auto;
+    }
+
+    .code-content pre {
+      margin: 0;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #abb2bf;
+    }
+
+    .code-content code {
+      color: #f8f9fa;
+    }
+
+    /* インラインコード */
+    code {
+      padding: 2px 6px;
+      background: rgba(0, 0, 0, 0.15);
+      color: #2c3e50;
+      font-size: 14px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      border-radius: 3px;
+    }
+
+    /* テーブル */
+    .api-table {
+      width: 100%;
+      margin: 24px 0;
+      border-collapse: collapse;
+      border: 1px solid #e2e2e3;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .api-table th {
+      background: #f6f6f7;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      color: #2c3e50;
+      border-bottom: 2px solid #e2e2e3;
+    }
+
+    .api-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e2e2e3;
+      color: #476582;
+    }
+
+    .api-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .api-table code {
+      padding: 2px 4px;
+      background: rgba(0, 0, 0, 0.15);
+      color: #2c3e50;
+      font-size: 13px;
+      border-radius: 3px;
+    }
+
+    /* アラートボックス */
+    .tip-box,
+    .warning-box,
+    .danger-box {
+      margin: 24px 0;
+      padding: 16px 20px;
+      border-radius: 8px;
+      border-left: 4px solid;
+    }
+
+    .tip-box {
+      background: #f0f9ff;
+      border-left-color: #42b883;
+    }
+
+    .warning-box {
+      background: #fffbf0;
+      border-left-color: #f6a623;
+    }
+
+    .danger-box {
+      background: #fff2f2;
+      border-left-color: #ff6b6b;
+    }
+
+    .tip-box strong,
+    .warning-box strong,
+    .danger-box strong {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .tip-box strong {
+      color: #42b883;
+    }
+
+    .tip-box code,
+    .warning-box code,
+    .danger-box code {
+      background: rgba(0, 0, 0, 0.1);
+      color: #2c3e50;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .warning-box strong {
+      color: #f6a623;
+    }
+
+    .danger-box strong {
+      color: #ff6b6b;
+    }
+
+    /* サンプルカード */
+    .sample-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 32px 0;
+    }
+
+    .sample-card {
+      padding: 20px;
+      background: #f6f6f7;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+
+    .sample-card:hover {
+      background: white;
+      border-color: #42b883;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .sample-card h4 {
+      color: #2c3e50;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .sample-card p {
+      color: #6a6a6a;
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* バッジ */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .badge-new {
+      background: #42b883;
+      color: white;
+    }
+
+    .badge-beta {
+      background: #f6a623;
+      color: white;
+    }
+
+    /* モバイル対応 */
+    .mobile-menu-toggle {
+      display: none;
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 100;
+      padding: 8px;
+      background: white;
+      border: 1px solid #e2e2e3;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .content-wrapper {
+        padding: 32px 24px 64px;
+      }
+
+      .mobile-menu-toggle {
+        display: block;
+      }
+
+      .page-header h1 {
+        font-size: 32px;
+      }
+    }
+
+    /* スクロールスパイ */
+    .section-in-view {
+      position: relative;
+    }
+
+    /* スムーススクロール */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* プログレスバー */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 280px;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #42b883 0%, #35495e 100%);
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 0.2s;
+      z-index: 100;
+    }
+
+    @media (max-width: 768px) {
+      .progress-bar {
+        left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- プログレスバー -->
+  <div class="progress-bar" id="progress-bar"></div>
+
+  <!-- モバイルメニュートグル -->
+  <button class="mobile-menu-toggle" id="menu-toggle">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 12h18M3 6h18M3 18h18"></path>
+    </svg>
+  </button>
+
+  <div class="docs-container">
+    <!-- サイドバー -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-content">
+        <h3>はじめに</h3>
+        <ul>
+          <li><a href="#introduction" class="nav-link">Zero Codeとは</a></li>
+          <li><a href="#quick-start" class="nav-link">クイックスタート</a></li>
+        </ul>
+
+        <h3>基本</h3>
+        <ul>
+          <li><a href="#installation" class="nav-link">インストール</a></li>
+          <li><a href="#basic-usage" class="nav-link">基本的な使い方</a></li>
+          <li><a href="#data-loading" class="nav-link">データの読み込み</a></li>
+        </ul>
+
+        <h3>データ構造</h3>
+        <ul>
+          <li><a href="#image-data" class="nav-link">画像データ</a></li>
+          <li><a href="#parts-data" class="nav-link">パーツデータ</a></li>
+          <li><a href="#page-data" class="nav-link">ページデータ</a></li>
+        </ul>
+
+        <h3>テンプレート</h3>
+        <ul>
+          <li><a href="#template-syntax" class="nav-link">テンプレート記法</a></li>
+          <li><a href="#text-input" class="nav-link">テキスト入力</a></li>
+          <li><a href="#select-input" class="nav-link">選択肢</a></li>
+          <li><a href="#array-loop" class="nav-link">z-記法（配列・条件・ネスト）</a></li>
+        </ul>
+
+        <h3>API</h3>
+        <ul>
+          <li><a href="#properties" class="nav-link">プロパティ</a></li>
+          <li><a href="#events" class="nav-link">イベント</a></li>
+          <li><a href="#methods" class="nav-link">メソッド</a></li>
+        </ul>
+
+        <h3>サンプル</h3>
+        <ul>
+          <li><a href="#samples" class="nav-link">サンプル集</a></li>
+          <li><a href="#live-demo" class="nav-link">ライブデモ</a></li>
+        </ul>
+
+        <h3>その他</h3>
+        <ul>
+          <li><a href="#integration" class="nav-link">他システムとの連携</a></li>
+          <li><a href="#troubleshooting" class="nav-link">トラブルシューティング</a></li>
+          <li><a href="#faq" class="nav-link">よくある質問</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+      <div class="content-wrapper">
+        <!-- ヘッダー -->
+        <div class="page-header">
+          <h1>Zero Code エディター</h1>
+          <p class="subtitle">📚 開発者・技術者向けドキュメント | Web Components対応ビジュアルCMSエディター</p>
+        </div>
+
+        <!-- イントロダクション -->
+        <section id="introduction" class="content-section">
+          <h2>Zero Codeとは</h2>
+          <p>
+            Zero Codeは、Web Components技術を基盤としたビジュアルCMSエディターです。このドキュメントは、Zero Codeを自社システムに組み込む<strong>開発者・技術者向け</strong>の統合ガイドです。Vue.js、React、プレーンHTML等、あらゆる技術スタックでご利用いただけます。
+          </p>
+          
+          <div class="alert-box" style="background: #e8f4f8; border-left: 4px solid #2196f3; padding: 16px; margin: 16px 0;">
+            <strong>🧑‍💻 対象読者</strong>
+            <ul style="margin: 8px 0 0; padding-left: 20px;">
+              <li>フロントエンド・バックエンド開発者</li>
+              <li>システムインテグレーター</li>
+              <li>技術責任者・アーキテクト</li>
+              <li>CMS導入を検討中のエンジニア</li>
+            </ul>
+          </div>
+
+          <h3>主な特徴</h3>
+          <ul>
+            <li>🎨 <strong>ビジュアル編集</strong> - ドラッグ&ドロップで直感的な操作</li>
+            <li>🔧 <strong>Web Components</strong> - どんなサイトにも簡単に統合</li>
+            <li>⚡ <strong>リアルタイムプレビュー</strong> - 編集内容を即座に確認</li>
+            <li>📱 <strong>レスポンシブ対応</strong> - あらゆるデバイスで美しく表示</li>
+            <li>🧩 <strong>コンポーネント指向</strong> - 再利用可能なパーツで効率的に構築</li>
+          </ul>
+        </section>
+
+        <!-- クイックスタート -->
+        <section id="quick-start" class="content-section">
+          <h2>クイックスタート</h2>
+          <p>最小構成でZero Codeエディターを導入する方法を説明します。</p>
+
+          <h3>必要なファイル</h3>
+          <ul>
+            <li><code>vue-cms-editor.optimized.umd.js</code> - メインライブラリ（Vue 3内包）</li>
+            <li><code>zero-code.css</code> - スタイルシート</li>
+          </ul>
+
+          <h3>最小構成のHTML</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="ja"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;link rel="stylesheet" href="./zero-code.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;!-- CMSエディター配置 --&gt;
+  &lt;zero-code id="editor"&gt;&lt;/zero-code&gt;
+  
+  &lt;!-- ライブラリ読み込み --&gt;
+  &lt;script src="./vue-cms-editor.optimized.umd.js"&gt;&lt;/script&gt;
+  
+  &lt;!-- 初期化 --&gt;
+  &lt;script&gt;
+    const editor = document.getElementById('editor');
+    // 空のデータで初期化
+    editor.commonImages = [];
+    editor.individualImages = [];
+    editor.parts = [];
+    editor.page = [];
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <strong>💡 ポイント</strong>
+            <code>&lt;zero-code&gt;</code>タグがWeb Componentsとして動作します。IDを付けることで、JavaScriptから操作できます。
+          </div>
+        </section>
+
+        <!-- インストール -->
+        <section id="installation" class="content-section">
+          <h2>インストール</h2>
+          
+          <h3>CDN経由</h3>
+          <p>最も簡単な方法は、CDNから直接読み込むことです（準備中）。</p>
+
+          <h3>ローカルファイル</h3>
+          <p>ビルド済みファイルをダウンロードして、プロジェクトに配置します。</p>
+          
+          <ol>
+            <li>必要なファイルをダウンロード</li>
+            <li>プロジェクトの適切な場所に配置</li>
+            <li>HTMLから読み込み</li>
+          </ol>
+        </section>
+
+        <!-- 基本的な使い方 -->
+        <section id="basic-usage" class="content-section">
+          <h2>基本的な使い方</h2>
+          
+          <h3>エディターの配置</h3>
+          <p>HTMLファイルの任意の場所に<code>&lt;zero-code&gt;</code>タグを配置します。</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;zero-code id="cms-editor"&gt;&lt;/zero-code&gt;</code></pre>
+            </div>
+          </div>
+
+          <h3>データの設定</h3>
+          <p>JavaScriptでエディターにデータを設定します。</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>const editor = document.getElementById('cms-editor');
+
+// データを設定
+editor.commonImages = [...];      // 共通画像
+editor.individualImages = [...];  // 個別画像
+editor.parts = [...];             // パーツ定義
+editor.page = [...];              // ページデータ</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- データの読み込み -->
+        <section id="data-loading" class="content-section">
+          <h2>データの読み込み</h2>
+
+          <h3>JavaScriptファイルから</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;!-- データファイル --&gt;
+&lt;script src="./sample-data.js"&gt;&lt;/script&gt;
+
+&lt;script&gt;
+  // グローバル変数からデータを取得
+  if (window.sampleData) {
+    const editor = document.getElementById('editor');
+    editor.commonImages = sampleData.images;
+    editor.parts = sampleData.parts;
+    editor.page = sampleData.pageData;
+  }
+&lt;/script&gt;</code></pre>
+            </div>
+          </div>
+
+          <h3>JSONファイルから</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>// JSONファイルを非同期で読み込み
+fetch('./my-cms-data.json')
+  .then(response => response.json())
+  .then(data => {
+    const editor = document.getElementById('editor');
+    editor.commonImages = data.images;
+    editor.parts = data.parts;
+    editor.page = data.pageData;
+  })
+  .catch(error => {
+    console.error('データ読み込みエラー:', error);
+  });</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- 画像データ -->
+        <section id="image-data" class="content-section">
+          <h2>画像データ</h2>
+          <p>画像データは共通画像と個別画像に分けて管理します。</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>const images = [
+  {
+    id: "hero_image",          // 一意のID（必須）
+    name: "ヒーロー画像",      // 表示名（必須）
+    url: "./img/hero.jpg",     // 画像URL（必須）
+    alt: "メインビジュアル",   // alt属性
+    width: 1920,               // 幅（ピクセル）
+    height: 1080               // 高さ（ピクセル）
+  }
+];</code></pre>
+            </div>
+          </div>
+
+          <table class="api-table">
+            <thead>
+              <tr>
+                <th>プロパティ</th>
+                <th>型</th>
+                <th>必須</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>id</code></td>
+                <td>string</td>
+                <td>◯</td>
+                <td>画像の一意な識別子</td>
+              </tr>
+              <tr>
+                <td><code>name</code></td>
+                <td>string</td>
+                <td>◯</td>
+                <td>エディターで表示される名前</td>
+              </tr>
+              <tr>
+                <td><code>url</code></td>
+                <td>string</td>
+                <td>◯</td>
+                <td>画像のURL（相対パスまたは絶対パス）</td>
+              </tr>
+              <tr>
+                <td><code>alt</code></td>
+                <td>string</td>
+                <td></td>
+                <td>代替テキスト</td>
+              </tr>
+              <tr>
+                <td><code>width</code></td>
+                <td>number</td>
+                <td></td>
+                <td>画像の幅（ピクセル）</td>
+              </tr>
+              <tr>
+                <td><code>height</code></td>
+                <td>number</td>
+                <td></td>
+                <td>画像の高さ（ピクセル）</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- パーツデータ -->
+        <section id="parts-data" class="content-section">
+          <h2>パーツデータ</h2>
+          <p>再利用可能なコンポーネントのテンプレートを定義します。</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>const parts = [
+  {
+    type: 'header',                    // パーツタイプ
+    description: 'ヘッダーコンポーネント',
+    module: [
+      {
+        title: 'site_header',          // パーツID
+        category: 'common',            // カテゴリ（common/individual）
+        description: 'サイトヘッダー',
+        tags: ['header', 'navigation'], // タグ（検索用）
+        body: `&lt;header&gt;
+  &lt;h1&gt;{$title:サイトタイトル}&lt;/h1&gt;
+  &lt;nav&gt;
+    &lt;a href="#"&gt;{$nav1:ホーム}&lt;/a&gt;
+    &lt;a href="#"&gt;{$nav2:概要}&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;`
+      }
+    ]
+  }
+];</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- ページデータ -->
+        <section id="page-data" class="content-section">
+          <h2>ページデータ</h2>
+          <p>実際にページに配置されるコンポーネントのインスタンスです。</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>const pageData = [
+  {
+    id: "header_1",              // インスタンスID
+    type: "header",              // パーツタイプ
+    module_name: "site_header",  // 使用するパーツ
+    parts: [],                   // ネストされたパーツ
+    // パラメータ値
+    title: "My Website",
+    nav1: "ホーム",
+    nav2: "概要"
+  }
+];</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- テンプレート記法 -->
+        <section id="template-syntax" class="content-section">
+          <h2>テンプレート記法</h2>
+          <p>Zero Codeでは、特別な記法を使ってテンプレートを定義します。テンプレート内で使用できる記法には、テキスト入力、選択肢、配列、パーツのネストなどがあります。</p>
+
+          <div class="tip-box">
+            <strong>💡 記法の概要</strong>
+            <ul style="margin: 8px 0 0; padding-left: 20px;">
+              <li><code>{$...}</code> - テキスト入力（波括弧）</li>
+              <li><code>($...)</code> - 選択肢（丸括弧）: ラジオボタン・セレクトボックス・チェックボックス</li>
+              <li><code>z-for</code> - 配列・繰り返し</li>
+              <li><code>z-for-wrapper</code> - 配列ラッパー（空配列時非表示）</li>
+              <li><code>z-if</code> - 条件表示</li>
+              <li><code>z-slot</code> - パーツのネスト</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- テキスト入力 -->
+        <section id="text-input" class="content-section">
+          <h2>テキスト入力</h2>
+          <p>波括弧 <code>{$...}</code> を使って、編集可能なテキストフィールドを定義します。エディターではテキストボックスとして表示されます。</p>
+
+          <h3>基本構文</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>{$paramName:デフォルト値}</code></pre>
+            </div>
+          </div>
+
+          <h3>使用例</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;h1&gt;{$title:ページタイトル}&lt;/h1&gt;
+&lt;p&gt;{$description:ページの説明文がここに入ります}&lt;/p&gt;
+&lt;img src="{$imageUrl:./img/sample.jpg}" alt="{$imageAlt:画像の説明}"&gt;</code></pre>
+            </div>
+          </div>
+
+          <table class="api-table">
+            <thead>
+              <tr>
+                <th>要素</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>$paramName</code></td>
+                <td>パラメータ名（英数字、アンダースコア使用可）</td>
+              </tr>
+              <tr>
+                <td><code>:</code></td>
+                <td>区切り文字</td>
+              </tr>
+              <tr>
+                <td><code>デフォルト値</code></td>
+                <td>初期値として表示されるテキスト</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 選択肢 -->
+        <section id="select-input" class="content-section">
+          <h2>選択肢</h2>
+          <p>丸括弧 <code>($...)</code> を使って、選択式の入力フィールドを定義します。区切り文字により異なるUIで表示されます。</p>
+
+          <h3>1. 単一選択（ラジオボタン）</h3>
+          <p>パイプ <code>|</code> で区切った選択肢は、ラジオボタンとして表示されます。</p>
+          
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>($paramName:option1|option2|option3)</code></pre>
+            </div>
+          </div>
+
+          <h4>使用例</h4>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;div class="($bgColor:bg-white|bg-light|bg-dark)"&gt;
+  &lt;button class="($btnStyle:btn-primary|btn-secondary|btn-outline)"&gt;
+    クリック
+  &lt;/button&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+          </div>
+
+          <h3>2. セレクトボックス</h3>
+          <p>カンマ <code>,</code> で区切った選択肢は、セレクトボックス（ドロップダウン）として表示されます。</p>
+          
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>($category:news,blog,event,product,service)</code></pre>
+            </div>
+          </div>
+
+          <h3>3. 複数選択（チェックボックス）</h3>
+          <p>パラメータ名に <code>?</code> を付けると、複数選択のチェックボックスとして表示されます。パイプまたはカンマで選択肢を区切れます。</p>
+          
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>($tags?:important|featured|popular)
+($categories?:news,blog,event,product)</code></pre>
+            </div>
+          </div>
+
+          <h4>使用例</h4>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;div class="($features?:responsive|animated|interactive)"&gt;
+  コンテンツ
+&lt;/div&gt;</code></pre>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <strong>💡 ポイント</strong>
+            <ul style="margin: 8px 0 0; padding-left: 20px;">
+              <li><strong>区切り文字</strong>: パイプ（<code>|</code>）→ ラジオボタン/チェックボックス、カンマ（<code>,</code>）→ セレクトボックス</li>
+              <li><strong>初期値</strong>: ラジオボタン・セレクトボックスは最初のオプション、チェックボックスは最初のオプション（配列形式）</li>
+              <li><strong>空オプション</strong>: 空のオプション（<code>||</code>）がある場合、「指定なし」が自動追加</li>
+              <li><strong>複数選択</strong>: チェックボックスの選択結果はスペース区切りで結合されます</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 配列・繰り返し -->
+        <section id="array-loop" class="content-section">
+          <h2>z-記法（配列・繰り返し・条件表示）</h2>
+          <p><code>z-</code>プレフィックスを持つ属性により、動的な要素の制御ができます。エディターでは対応する編集機能が提供されます。</p>
+
+          <h3>1. z-for（配列繰り返し）</h3>
+          <p>配列データを繰り返し表示できます。エディターでは配列アイテムの追加・削除・並び替えが可能です。</p>
+
+          <h4>基本構文</h4>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;親要素&gt;
+  &lt;子要素 z-for="配列名"&gt;
+    &lt;!-- 配列アイテムのテンプレート --&gt;
+    ($プロパティ名:デフォルト値)
+  &lt;/子要素&gt;
+&lt;/親要素&gt;</code></pre>
+            </div>
+          </div>
+
+          <h3>使用例</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;!-- リスト --&gt;
+&lt;ul&gt;
+  &lt;li z-for="items"&gt;
+    &lt;h3&gt;($title:アイテムタイトル)&lt;/h3&gt;
+    &lt;p&gt;($description:アイテムの説明)&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- カードグリッド --&gt;
+&lt;div class="card-grid"&gt;
+  &lt;div class="card" z-for="cards"&gt;
+    &lt;img src="($imageUrl:./img/card.jpg)" alt="($imageAlt:カード画像)"&gt;
+    &lt;h4&gt;{$cardTitle:カードタイトル}&lt;/h4&gt;
+    &lt;p&gt;{$cardText:カードの説明文}&lt;/p&gt;
+    &lt;button class="($btnColor:btn-primary|btn-secondary)"&gt;
+      ($btnText:詳細を見る)
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+          </div>
+
+          <h3>z-for-wrapper属性</h3>
+          <p>配列全体を囲むラッパー要素が必要な場合は、<code>z-for-wrapper</code>属性を使用します。</p>
+          
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;div class="wrapper" z-for-wrapper="items"&gt;
+  &lt;div z-for="items"&gt;
+    &lt;p&gt;($text:アイテムテキスト)&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+          </div>
+
+          <div class="warning-box">
+            <strong>⚠️ 注意事項</strong>
+            <ul style="margin: 8px 0 0; padding-left: 20px;">
+              <li>z-for内で定義されたフィールドは、その配列アイテム編集時のみ表示されます</li>
+              <li>配列名は英数字とアンダースコアのみ使用可能</li>
+              <li>ネストしたz-forもサポートされています</li>
+            </ul>
+          </div>
+          <h3>2. z-for-wrapper（配列ラッパー）</h3>
+          <p>配列が空の場合に要素自体を非表示にします。z-forと組み合わせて使用します。</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;div z-for-wrapper="arrayName"&gt;
+  &lt;h3&gt;リストタイトル&lt;/h3&gt;
+  &lt;ul&gt;
+    &lt;li z-for="arrayName"&gt;($item:アイテム)&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+          </div>
+
+          <h3>3. z-if（条件表示）</h3>
+          <p>コンポーネントのプロパティ値に基づいて要素の表示/非表示を制御します。</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;div z-if="showDetails" class="details-section"&gt;
+  &lt;p&gt;{$details:詳細情報}&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div z-if="type_premium"&gt;
+  &lt;p&gt;プレミアムユーザー向けコンテンツ&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+          </div>
+
+          <h3>4. z-slot（パーツネスト）</h3>
+          <p>他のパーツを入れ子にする位置を指定します。</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;div z-slot="nested_parts"&gt;&lt;/div&gt;</code></pre>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <strong>💡 z-記法のポイント</strong>
+            <ul style="margin: 8px 0 0; padding-left: 20px;">
+              <li><strong>z-for</strong>: 配列データの追加・削除・編集・並び替えが可能</li>
+              <li><strong>z-for-wrapper</strong>: 配列が空の場合はセクション全体を非表示</li>
+              <li><strong>z-if</strong>: ブール値または特定文字列による条件判定</li>
+              <li><strong>z-slot</strong>: ネストパーツの挿入位置を指定</li>
+              <li>ネストしたz-forもサポートされています</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- パーツのネスト -->
+
+        <!-- 記法の組み合わせ -->
+        <section id="template-combination" class="content-section">
+          <h2>記法の組み合わせ</h2>
+          <p>各記法は自由に組み合わせて使用できます。</p>
+
+          <h3>実践的な例</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>&lt;!-- 製品カタログコンポーネント --&gt;
+&lt;section class="products ($bgStyle:bg-white|bg-gray|bg-light)"&gt;
+  &lt;div class="container"&gt;
+    &lt;h2&gt;{$sectionTitle:製品カタログ}&lt;/h2&gt;
+    &lt;p&gt;{$sectionDesc:取り扱い製品をご紹介します}&lt;/p&gt;
+    
+    &lt;div class="product-grid" z-for="products"&gt;
+      &lt;div class="product-card ($cardStyle:card-basic|card-featured)"&gt;
+        &lt;img src="($productImage:./img/product.jpg)" 
+             alt="($productAlt:製品画像)"&gt;
+        &lt;h3&gt;{$productName:製品名}&lt;/h3&gt;
+        &lt;p&gt;{$productDesc:製品の説明}&lt;/p&gt;
+        &lt;div class="price"&gt;
+          &lt;span class="($priceColor:text-red|text-blue|text-green)"&gt;
+            {$price:¥10,000}
+          &lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class="($features?:new|sale|limited)"&gt;
+          &lt;!-- 選択された特徴に応じてバッジ表示 --&gt;
+        &lt;/div&gt;
+        &lt;div z-slot="product_cta"&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <strong>💡 ベストプラクティス</strong>
+            <ul style="margin: 8px 0 0; padding-left: 20px;">
+              <li>パラメータ名は分かりやすく、意味のある名前を使用</li>
+              <li>デフォルト値は実際のコンテンツに近いものを設定</li>
+              <li>選択肢は3〜5個程度に抑える</li>
+              <li>z-forは最大2階層程度のネストに留める</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- プロパティ -->
+        <section id="properties" class="content-section">
+          <h2>プロパティ</h2>
+          
+          <table class="api-table">
+            <thead>
+              <tr>
+                <th>プロパティ名</th>
+                <th>型</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>commonImages</code></td>
+                <td>Array</td>
+                <td>共通画像データの配列</td>
+              </tr>
+              <tr>
+                <td><code>individualImages</code></td>
+                <td>Array</td>
+                <td>個別画像データの配列</td>
+              </tr>
+              <tr>
+                <td><code>parts</code></td>
+                <td>Array</td>
+                <td>パーツ定義の配列</td>
+              </tr>
+              <tr>
+                <td><code>page</code></td>
+                <td>Array</td>
+                <td>ページデータの配列</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- イベント -->
+        <section id="events" class="content-section">
+          <h2>イベント</h2>
+
+          <table class="api-table">
+            <thead>
+              <tr>
+                <th>イベント名</th>
+                <th>詳細</th>
+                <th>データ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>save</code></td>
+                <td>保存ボタンクリック時</td>
+                <td>現在の全データ</td>
+              </tr>
+              <tr>
+                <td><code>change</code></td>
+                <td>データ変更時</td>
+                <td>変更されたデータ</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>使用例</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>editor.addEventListener('save', (event) => {
+  const data = event.detail;
+  console.log('保存データ:', data);
+  
+  // サーバーに送信
+  fetch('/api/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+});</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- メソッド -->
+        <section id="methods" class="content-section">
+          <h2>メソッド</h2>
+          
+          <div class="warning-box">
+            <strong>⚠️ 注意</strong>
+            以下のメソッドは内部実装に依存するため、将来変更される可能性があります。
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>// Vueインスタンスへのアクセス（非推奨）
+const instance = editor._instance?.exposed;
+if (instance) {
+  // データ取得
+  const currentData = instance.getData();
+  
+  // リセット
+  instance.reset();
+}</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- サンプル集 -->
+        <section id="samples" class="content-section">
+          <h2>サンプル集</h2>
+          <p>実際に動作するサンプルページをご覧いただけます。</p>
+
+          <div class="sample-grid">
+            <a href="./index.html" target="_blank" class="sample-card">
+              <h4>📝 基本サンプル</h4>
+              <p>最小構成のCMSエディター。空のデータから始めて、パーツを追加していく基本的な使い方を確認できます。</p>
+            </a>
+
+            <a href="./furisode-demo.html" target="_blank" class="sample-card">
+              <h4>👘 振袖専門店デモ</h4>
+              <p>実際のECサイトを想定した本格的なデモ。ヘッダー、ヒーロー、商品一覧など、実用的なパーツの使用例です。</p>
+            </a>
+
+            <a href="./blog.html" target="_blank" class="sample-card">
+              <h4>📰 ブログシステム</h4>
+              <p>ブログ記事の作成・編集に特化したサンプル。固定レイアウトとCMS管理コンテンツの組み合わせ例です。</p>
+            </a>
+
+            <a href="./usage-example.html" target="_blank" class="sample-card">
+              <h4>🔬 APIサンプル</h4>
+              <p>各種APIの動作を確認できる技術デモ。イベント処理やデータ操作の実装例を掲載しています。</p>
+            </a>
+          </div>
+
+          <h3>サンプルデータファイル</h3>
+          <ul>
+            <li><a href="./sample-data.js" target="_blank">sample-data.js</a> - JavaScript形式のサンプルデータ</li>
+            <li><a href="./my-cms-data.json" target="_blank">my-cms-data.json</a> - JSON形式のサンプルデータ</li>
+            <li><a href="./furisode-data.js" target="_blank">furisode-data.js</a> - 振袖デモ用データ</li>
+            <li><a href="./blog-data.js" target="_blank">blog-data.js</a> - ブログ用データ</li>
+          </ul>
+        </section>
+
+        <!-- ライブデモ -->
+        <section id="live-demo" class="content-section">
+          <h2>ライブデモ</h2>
+          <p>各デモページで実際のエディター動作を確認できます。</p>
+          
+          <div class="tip-box">
+            <strong>💡 お試しください</strong>
+            サンプルページでは、実際にコンテンツを編集したり、パーツを追加したりできます。
+            変更は保存されないので、自由にお試しください。
+          </div>
+        </section>
+
+        <!-- 他システムとの連携 -->
+        <section id="integration" class="content-section">
+          <h2>他システムとの連携</h2>
+
+          <h3>WordPress</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">PHP</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>// functions.php
+function enqueue_zero_code_editor() {
+  wp_enqueue_style('zero-code', 
+    get_template_directory_uri() . '/assets/zero-code.css');
+  wp_enqueue_script('zero-code', 
+    get_template_directory_uri() . '/assets/vue-cms-editor.optimized.umd.js', 
+    array(), '1.0.0', true);
+  
+  // WordPressのデータをJavaScriptに渡す
+  wp_localize_script('zero-code', 'cmsData', array(
+    'images' => get_cms_images(),
+    'parts' => get_cms_parts(),
+    'pageData' => get_cms_page_data()
+  ));
+}
+add_action('wp_enqueue_scripts', 'enqueue_zero_code_editor');</code></pre>
+            </div>
+          </div>
+
+          <h3>React</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JSX</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>import { useEffect, useRef } from 'react';
+
+function CMSEditor({ images, parts, pageData }) {
+  const editorRef = useRef(null);
+  
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.commonImages = images;
+      editorRef.current.parts = parts;
+      editorRef.current.page = pageData;
+    }
+  }, [images, parts, pageData]);
+  
+  return &lt;zero-code ref={editorRef} /&gt;;
+}</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- トラブルシューティング -->
+        <section id="troubleshooting" class="content-section">
+          <h2>トラブルシューティング</h2>
+
+          <h3>エディターが表示されない</h3>
+          <ul>
+            <li>JavaScriptコンソールでエラーが出ていないか確認</li>
+            <li><code>vue-cms-editor.optimized.umd.js</code>が正しく読み込まれているか確認</li>
+            <li><code>&lt;zero-code&gt;</code>タグにIDが設定されているか確認</li>
+          </ul>
+
+          <h3>パーツ追加ボタンが効かない</h3>
+          <p>パーツデータが正しく設定されているか確認してください：</p>
+          
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+            </div>
+            <div class="code-content">
+              <pre><code>// 最低限必要な構造
+editor.parts = [
+  {
+    type: 'content',
+    description: 'コンテンツ',
+    module: []  // 空でも配列が必要
+  }
+];</code></pre>
+            </div>
+          </div>
+
+          <h3>画像が表示されない</h3>
+          <p>画像URLが正しいパスになっているか確認してください。相対パスはHTMLファイルからの相対パスです。</p>
+
+          <h3>データが保存されない</h3>
+          <p>Zero Codeエディターはフロントエンドのみで動作します。永続化にはバックエンドの実装が必要です。</p>
+        </section>
+
+        <!-- よくある質問 -->
+        <section id="faq" class="content-section">
+          <h2>よくある質問</h2>
+
+          <h4>Q: ライセンスは？</h4>
+          <p>A: プロジェクトのライセンスファイルをご確認ください。</p>
+
+          <h4>Q: IE11に対応していますか？</h4>
+          <p>A: Web Components技術を使用しているため、モダンブラウザのみサポートしています。</p>
+
+          <h4>Q: TypeScriptの型定義はありますか？</h4>
+          <p>A: 現在準備中です。</p>
+
+          <h4>Q: サーバーサイドレンダリング（SSR）に対応していますか？</h4>
+          <p>A: クライアントサイドのみで動作します。</p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // スクロールプログレスバー
+    function updateProgressBar() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollPercent = scrollTop / scrollHeight;
+      document.getElementById('progress-bar').style.transform = `scaleX(${scrollPercent})`;
+    }
+
+    window.addEventListener('scroll', updateProgressBar);
+
+    // アクティブリンクのハイライト
+    function highlightActiveLink() {
+      const sections = document.querySelectorAll('.content-section');
+      const navLinks = document.querySelectorAll('.nav-link');
+      
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (window.pageYOffset >= sectionTop - 100) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', highlightActiveLink);
+
+    // モバイルメニュー
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+
+    // サイドバーリンククリックでモバイルメニューを閉じる
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove('open');
+        }
+      });
+    });
+
+    // コードコピー機能
+    function copyCode(button) {
+      const codeBlock = button.closest('.code-block');
+      const codeText = codeBlock.querySelector('code').textContent;
+      
+      navigator.clipboard.writeText(codeText).then(() => {
+        button.textContent = 'コピーしました';
+        button.classList.add('copied');
+        
+        setTimeout(() => {
+          button.textContent = 'コピー';
+          button.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        console.error('コピーに失敗しました:', err);
+      });
+    }
+
+    // 初期化
+    document.addEventListener('DOMContentLoaded', () => {
+      updateProgressBar();
+      highlightActiveLink();
+    });
+  </script>
+</body>
+</html>

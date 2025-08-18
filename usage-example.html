@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Zero Code エディター - APIサンプル</title>
+  <link rel="stylesheet" href="./zero-code.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/common.css">
+  <style>
+    .example-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .example-header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .example-header h1 {
+      font-size: 2rem;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .example-layout {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .editor-section {
+      background: white;
+      border: 1px solid #dee2e6;
+      border-radius: 10px;
+      padding: 20px;
+      min-height: 500px;
+    }
+
+    .control-section {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+    }
+
+    .control-section h3 {
+      margin-bottom: 20px;
+      color: #495057;
+      font-size: 1.2rem;
+    }
+
+    .control-group {
+      margin-bottom: 25px;
+      padding-bottom: 25px;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .control-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .control-group h4 {
+      margin-bottom: 15px;
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      background: #0056b3;
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-success {
+      background: #28a745;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .btn-warning {
+      background: #ffc107;
+      color: #212529;
+    }
+
+    .btn-warning:hover {
+      background: #e0a800;
+    }
+
+    .btn-info {
+      background: #17a2b8;
+    }
+
+    .btn-info:hover {
+      background: #138496;
+    }
+
+    .console-output {
+      background: #212529;
+      color: #28a745;
+      padding: 15px;
+      border-radius: 5px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      min-height: 150px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+
+    .console-output .log-entry {
+      margin-bottom: 5px;
+      padding: 3px 0;
+      border-bottom: 1px solid #343a40;
+    }
+
+    .console-output .log-time {
+      color: #6c757d;
+      margin-right: 10px;
+    }
+
+    .console-output .log-type {
+      color: #ffc107;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    .console-output .log-message {
+      color: #28a745;
+    }
+
+    .console-output .log-error {
+      color: #dc3545;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #28a745;
+      margin-right: 10px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+      }
+    }
+
+    .data-preview {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      padding: 10px;
+      margin-top: 10px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .info-box {
+      background: #d1ecf1;
+      border: 1px solid #17a2b8;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .info-box strong {
+      color: #0c5460;
+    }
+
+    @media (max-width: 768px) {
+      .example-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .control-section {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="example-container">
+    <!-- ヘッダー -->
+    <div class="example-header">
+      <h1>🔬 Zero Code エディター APIサンプル</h1>
+      <p>各種APIの動作を確認できる技術デモです。右側のコントロールパネルで操作してください。</p>
+    </div>
+
+    <div class="info-box">
+      <strong>💡 使い方:</strong> 右側のボタンをクリックして、各APIの動作を確認できます。コンソール出力で詳細を確認してください。
+    </div>
+
+    <!-- メインレイアウト -->
+    <div class="example-layout">
+      <!-- エディターセクション -->
+      <div class="editor-section">
+        <h2 style="margin-bottom: 20px;">エディター <span class="status-indicator"></span></h2>
+        <zero-code id="api-demo-editor"></zero-code>
+      </div>
+
+      <!-- コントロールセクション -->
+      <div class="control-section">
+        <h3>🎮 コントロールパネル</h3>
+
+        <!-- データ操作 -->
+        <div class="control-group">
+          <h4>📊 データ操作</h4>
+          <button class="btn" onclick="loadSampleData()">サンプルデータ読み込み</button>
+          <button class="btn btn-warning" onclick="loadEmptyData()">空データで初期化</button>
+          <button class="btn btn-info" onclick="getCurrentData()">現在のデータ取得</button>
+          <button class="btn btn-danger" onclick="clearAllData()">全データクリア</button>
+        </div>
+
+        <!-- パーツ操作 -->
+        <div class="control-group">
+          <h4>🧩 パーツ操作</h4>
+          <button class="btn" onclick="addSamplePart()">サンプルパーツ追加</button>
+          <button class="btn btn-info" onclick="listAllParts()">パーツ一覧表示</button>
+        </div>
+
+        <!-- 画像操作 -->
+        <div class="control-group">
+          <h4>🖼️ 画像操作</h4>
+          <button class="btn" onclick="addSampleImage()">サンプル画像追加</button>
+          <button class="btn btn-info" onclick="listAllImages()">画像一覧表示</button>
+        </div>
+
+        <!-- イベントテスト -->
+        <div class="control-group">
+          <h4>⚡ イベントテスト</h4>
+          <button class="btn btn-success" onclick="triggerSaveEvent()">保存イベント発火</button>
+          <button class="btn" onclick="listenToEvents()">イベントリスナー開始</button>
+          <button class="btn btn-warning" onclick="stopListening()">リスナー停止</button>
+        </div>
+
+        <!-- データプレビュー -->
+        <div class="data-preview" id="data-preview">
+          データプレビューエリア
+        </div>
+
+        <!-- コンソール出力 -->
+        <div class="console-output" id="console-output">
+          <div class="log-entry">
+            <span class="log-time">00:00:00</span>
+            <span class="log-type">[INFO]</span>
+            <span class="log-message">コンソール出力がここに表示されます</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ライブラリ読み込み -->
+  <script src="./vue-cms-editor.optimized.umd.js"></script>
+
+  <!-- API操作スクリプト -->
+  <script>
+    // エディター要素取得
+    const editor = document.getElementById('api-demo-editor');
+    const consoleOutput = document.getElementById('console-output');
+    const dataPreview = document.getElementById('data-preview');
+
+    // コンソールログ関数
+    function logToConsole(message, type = 'INFO') {
+      const now = new Date();
+      const time = now.toTimeString().split(' ')[0];
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      
+      const messageClass = type === 'ERROR' ? 'log-error' : 'log-message';
+      
+      entry.innerHTML = `
+        <span class="log-time">${time}</span>
+        <span class="log-type">[${type}]</span>
+        <span class="${messageClass}">${message}</span>
+      `;
+      
+      consoleOutput.appendChild(entry);
+      consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+
+    // 初期化
+    window.addEventListener('DOMContentLoaded', () => {
+      logToConsole('エディター初期化完了', 'SUCCESS');
+      
+      // 初期データ設定
+      editor.commonImages = [];
+      editor.individualImages = [];
+      editor.parts = [];
+      editor.page = [];
+    });
+
+    // サンプルデータ読み込み
+    function loadSampleData() {
+      const sampleData = {
+        images: [
+          {
+            id: "sample_1",
+            name: "サンプル画像1",
+            url: "./img/placeholder.jpg",
+            alt: "プレースホルダー"
+          }
+        ],
+        parts: [
+          {
+            type: 'title',
+            description: 'タイトルコンポーネント',
+            module: [
+              {
+                title: 'sample_title',
+                category: 'common',
+                description: 'サンプルタイトル',
+                tags: ['title', 'sample'],
+                body: '<h2>{$title:サンプルタイトル}</h2>'
+              }
+            ]
+          },
+          {
+            type: 'content',
+            description: 'コンテンツコンポーネント',
+            module: [
+              {
+                title: 'sample_content',
+                category: 'common',
+                description: 'サンプルコンテンツ',
+                tags: ['content', 'sample'],
+                body: '<div class="content"><p>{$text:サンプルテキスト}</p></div>'
+              }
+            ]
+          }
+        ],
+        pageData: [
+          {
+            id: "sample_instance_1",
+            type: "title",
+            module_name: "sample_title",
+            parts: [],
+            title: "APIサンプルページ"
+          }
+        ]
+      };
+
+      editor.commonImages = sampleData.images;
+      editor.parts = sampleData.parts;
+      editor.page = sampleData.pageData;
+
+      logToConsole('サンプルデータを読み込みました', 'SUCCESS');
+      updateDataPreview(sampleData);
+    }
+
+    // 空データで初期化
+    function loadEmptyData() {
+      editor.commonImages = [];
+      editor.individualImages = [];
+      editor.parts = [{
+        type: 'content',
+        description: 'コンテンツ',
+        module: []
+      }];
+      editor.page = [];
+
+      logToConsole('空データで初期化しました', 'SUCCESS');
+      updateDataPreview({images: [], parts: editor.parts, pageData: []});
+    }
+
+    // 現在のデータ取得
+    function getCurrentData() {
+      const data = {
+        commonImages: editor.commonImages || [],
+        individualImages: editor.individualImages || [],
+        parts: editor.parts || [],
+        page: editor.page || []
+      };
+
+      logToConsole('現在のデータを取得しました', 'INFO');
+      console.log('Current Data:', data);
+      updateDataPreview(data);
+    }
+
+    // 全データクリア
+    function clearAllData() {
+      if (confirm('本当に全データをクリアしますか？')) {
+        editor.commonImages = [];
+        editor.individualImages = [];
+        editor.parts = [];
+        editor.page = [];
+
+        logToConsole('全データをクリアしました', 'WARNING');
+        updateDataPreview({});
+      }
+    }
+
+    // サンプルパーツ追加
+    function addSamplePart() {
+      const newPart = {
+        type: 'custom',
+        description: '動的追加パーツ',
+        module: [
+          {
+            title: `custom_part_${Date.now()}`,
+            category: 'common',
+            description: '動的に追加されたパーツ',
+            tags: ['custom', 'dynamic'],
+            body: '<div class="custom">($color:primary|secondary) {$content:動的コンテンツ}</div>'
+          }
+        ]
+      };
+
+      const currentParts = editor.parts || [];
+      currentParts.push(newPart);
+      editor.parts = currentParts;
+
+      logToConsole(`新しいパーツを追加しました: ${newPart.module[0].title}`, 'SUCCESS');
+    }
+
+    // パーツ一覧表示
+    function listAllParts() {
+      const parts = editor.parts || [];
+      const partsList = parts.map(section => 
+        section.module.map(part => part.title).join(', ')
+      ).filter(Boolean).join(', ');
+
+      logToConsole(`パーツ一覧: ${partsList || 'なし'}`, 'INFO');
+      updateDataPreview({parts});
+    }
+
+    // サンプル画像追加
+    function addSampleImage() {
+      const newImage = {
+        id: `image_${Date.now()}`,
+        name: `動的画像 ${new Date().toLocaleTimeString()}`,
+        url: "./img/placeholder.jpg",
+        alt: "動的に追加された画像"
+      };
+
+      const currentImages = editor.commonImages || [];
+      currentImages.push(newImage);
+      editor.commonImages = currentImages;
+
+      logToConsole(`新しい画像を追加しました: ${newImage.name}`, 'SUCCESS');
+    }
+
+    // 画像一覧表示
+    function listAllImages() {
+      const images = editor.commonImages || [];
+      const imagesList = images.map(img => img.name).join(', ');
+
+      logToConsole(`画像一覧: ${imagesList || 'なし'}`, 'INFO');
+      updateDataPreview({images});
+    }
+
+    // 保存イベント発火
+    function triggerSaveEvent() {
+      // 保存イベントをシミュレート
+      const event = new CustomEvent('save', {
+        detail: {
+          images: editor.commonImages,
+          parts: editor.parts,
+          page: editor.page
+        }
+      });
+      editor.dispatchEvent(event);
+
+      logToConsole('保存イベントを発火しました', 'SUCCESS');
+    }
+
+    // イベントリスナー
+    let eventListeners = [];
+
+    function listenToEvents() {
+      // 既存のリスナーをクリア
+      stopListening();
+
+      // 保存イベント
+      const saveListener = (e) => {
+        logToConsole('保存イベントを検知しました', 'EVENT');
+        console.log('Save Event Data:', e.detail);
+      };
+
+      // 変更イベント
+      const changeListener = (e) => {
+        logToConsole('変更イベントを検知しました', 'EVENT');
+        console.log('Change Event Data:', e.detail);
+      };
+
+      editor.addEventListener('save', saveListener);
+      editor.addEventListener('change', changeListener);
+
+      eventListeners.push({type: 'save', listener: saveListener});
+      eventListeners.push({type: 'change', listener: changeListener});
+
+      logToConsole('イベントリスナーを開始しました', 'SUCCESS');
+    }
+
+    // リスナー停止
+    function stopListening() {
+      eventListeners.forEach(({type, listener}) => {
+        editor.removeEventListener(type, listener);
+      });
+      eventListeners = [];
+
+      logToConsole('イベントリスナーを停止しました', 'WARNING');
+    }
+
+    // データプレビュー更新
+    function updateDataPreview(data) {
+      dataPreview.textContent = JSON.stringify(data, null, 2);
+    }
+
+    // 初期ログ
+    setTimeout(() => {
+      logToConsole('APIデモページが読み込まれました。右側のボタンで操作してください。', 'INFO');
+    }, 500);
+  </script>
+</body>
+</html>
